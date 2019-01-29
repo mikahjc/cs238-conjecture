@@ -30,12 +30,12 @@ namespace Conjecture
             }
             while (!startSet)
             {
-                Console.Write("Enter start number (inclusive): ");
+                Console.Write("Enter start number: ");
                 startSet = decimal.TryParse(Console.ReadLine(), out num);
             }
             while (!endSet)
             {
-                Console.Write("Enter end number (exclusive): ");
+                Console.Write("Enter end number: ");
                 endSet = decimal.TryParse(Console.ReadLine(), out maxNum);
             }
 
@@ -46,7 +46,7 @@ namespace Conjecture
             }
 
             decimal range = maxNum - num;
-            decimal interval = range / threadsToAllocate;
+            decimal interval = Math.Floor(range / threadsToAllocate);
             Console.WriteLine($"\r\nVerifying {range} numbers on {threadsToAllocate} threads.");
             Console.WriteLine($"Each thread will verify {interval} numbers.\r\n");
 
@@ -54,8 +54,17 @@ namespace Conjecture
             List<Task<decimal>> tasks = new List<Task<decimal>>();
             for (int i = 0; i < threadsToAllocate; i++)
             {
-                Console.WriteLine($"Thread {i}: {num}-{num + interval - 1}");
-                tasks.Add(VerifyRange(num, num + interval - 1));
+                decimal rangeEnd = 0;
+                if (i == threadsToAllocate - 1)
+                {
+                    rangeEnd = maxNum;
+                }
+                else
+                {
+                    rangeEnd = num + interval - 1;
+                }
+                Console.WriteLine($"Thread {i}: {num}-{rangeEnd}");
+                tasks.Add(VerifyRange(num, rangeEnd));
                 num += interval;
             }
 
